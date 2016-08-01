@@ -9,7 +9,7 @@ Imissher.prototype.on = function (event_name, callback) {
     callback: callback,
     once: false
   });
-  this.replay(event_name, callback);
+  this._replay(event_name, callback);
 };
 
 Imissher.prototype.once = function (event_name, callback) {
@@ -18,7 +18,7 @@ Imissher.prototype.once = function (event_name, callback) {
     callback: callback,
     once: true
   });
-  this.replay(event_name, callback);
+  this._replay(event_name, callback);
 };
 
 Imissher.prototype.emit = function () {
@@ -51,7 +51,7 @@ Imissher.prototype._emit = function (event, onlyThisBinding) {
   }.bind(this));;
 };
 
-Imissher.prototype.replay = function (event_name, callback) {
+Imissher.prototype._replay = function (event_name, callback) {
   this.events.forEach(function (event) {
     var binding = {
       event_name: event_name,
