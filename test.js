@@ -44,11 +44,11 @@ module.exports = {
     var imissher = new Imissher();
 
     imissher.emit(RANDYQUAID, 1);
-    imissher.emit(RANDYQUAID, 2);
 
     imissher.on(RANDYQUAID, pushNum);
     imissher.on(RANDYQUAID, pushNumToo);
 
+    imissher.emit(RANDYQUAID, 2);
     imissher.removeListener(RANDYQUAID, pushNum);
     imissher.emit(RANDYQUAID, 3);
 
