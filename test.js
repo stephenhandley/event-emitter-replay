@@ -17,19 +17,17 @@ function emitThreeEvents (once) {
 }
 
 module.exports = {
-  '.on should provide replayable, repeated event triggers': function (done) {
+  '.on should provide replayable, repeated event triggers': function () {
     var events = emitThreeEvents(false);
     Assert.deepEqual(events, [1, 2, 3], 'Should have 3 events');
-    done();
   },
 
-  '.once should provide one-time event triggers': function (done) {
+  '.once should provide one-time event triggers': function () {
     var events = emitThreeEvents(true);
     Assert.deepEqual(events, [1], 'Should have only 1 event');
-    done();
   },
 
-  '.removeListener should remove event bindings': function (done) {
+  '.removeListener should remove event bindings': function () {
     var eventsOne = [];
     var eventsToo = [];
 
@@ -54,7 +52,31 @@ module.exports = {
 
     Assert.deepEqual(eventsOne, [1, 2], 'eventsOne should have only two events');
     Assert.deepEqual(eventsToo, [1, 2, 3], 'eventsToo should have all three events');
+  },
 
-    done();
+  '.removeListener should work with .once': function () {
+    var eventsOne = [];
+    var eventsToo = [];
+
+    var pushNum = function (num) {
+      eventsOne.push(num);
+    }
+
+    var pushNumToo = function (num) {
+      eventsToo.push(num);
+    }
+
+    var imissher = new Imissher();
+
+    imissher.once(RANDYQUAID, pushNum);
+    imissher.once(RANDYQUAID, pushNumToo);
+
+    imissher.removeListener(RANDYQUAID, pushNum);
+    imissher.emit(RANDYQUAID, 1);
+    imissher.emit(RANDYQUAID, 2);
+    imissher.emit(RANDYQUAID, 3);
+
+    Assert.deepEqual(eventsOne, [], 'eventsOne should be empty');
+    Assert.deepEqual(eventsToo, [1], 'eventsToo should have one event');
   }
 };
