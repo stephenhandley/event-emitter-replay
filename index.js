@@ -2,27 +2,31 @@ function EventEmitterReplay (args) {
   if (!args) {
     args = {};
   }
+  this.greedy = !!args.greedy;
   this.repeat = !!args.repeat;
+
   this.events = [];
   this.bindings = [];
 }
 
 EventEmitterReplay.prototype.on = function (event_name, callback) {
-  this.bindings.push({
+  var binding = {
     event_name: event_name,
     callback: callback,
     once: false
-  });
-  this._replay(event_name, callback);
+  };
+  this.bindings.push(binding);
+  this._replay(binding);
 };
 
 EventEmitterReplay.prototype.once = function (event_name, callback) {
-  this.bindings.push({
+  var binding = {
     event_name: event_name,
     callback: callback,
     once: true
-  });
-  this._replay(event_name, callback);
+  };
+  this.bindings.push(binding);
+  this._replay(binding);
 };
 
 EventEmitterReplay.prototype.emit = function () {
@@ -30,14 +34,18 @@ EventEmitterReplay.prototype.emit = function () {
   var args = Array.prototype.slice.call(arguments, 1);
   var event = {
     name: event_name,
-    args: args
+    args: args,
+    consumed: false
   };
   this.events.push(event);
   this._emit(event);
 };
 
 EventEmitterReplay.prototype._emit = function (event, onlyThisBinding) {
-  this.bindings.forEach(function (binding) {
+  var skip = false;
+  var remove_binding = null;
+
+  this.bindings.forEach(function (binding, i) {
     var doit;
     if (onlyThisBinding) {
       doit = this._bindingsEqual(binding, onlyThisBinding);
@@ -45,27 +53,34 @@ EventEmitterReplay.prototype._emit = function (event, onlyThisBinding) {
       doit = (binding.event_name === event.name);
     }
 
+    if (this.greedy && event.consumed) {
+      doit = false;
+    }
+
     if (doit) {
       var callback = binding.callback;
       callback.apply(null, event.args);
+      event.consumed = true;
+
       if (binding.once) {
-        this.removeListener(binding.event_name, callback);
+        remove_binding = binding;
       }
     }
   }.bind(this));;
+
+  if (remove_binding) {
+    this.removeListener(remove_binding.event_name, remove_binding.callback);
+  }
 };
 
-EventEmitterReplay.prototype._replay = function (event_name, callback) {
+EventEmitterReplay.prototype._replay = function (binding) {
   this.events.forEach(function (event) {
-    var binding = this.repeat ? null : {
-      event_name: event_name,
-      callback: callback
-    };
-    this._emit(event, binding);
+    this._emit(event, this.repeat ? null : binding);
   }.bind(this));
 };
 
 EventEmitterReplay.prototype.removeListener = function (event_name, callback) {
+  var index = -1;
   this.bindings.forEach(function (binding, i) {
     var matches = this._bindingsEqual(binding, {
       event_name: event_name,
@@ -73,9 +88,13 @@ EventEmitterReplay.prototype.removeListener = function (event_name, callback) {
     });
 
     if (matches) {
-      this.bindings.splice(i, 1);
+      index = i;
     }
   }.bind(this));
+
+  if (index !== -1) {
+    this.bindings.splice(index, 1);
+  }
 };
 
 EventEmitterReplay.prototype._bindingsEqual = function (binding1, binding2) {
