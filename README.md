@@ -1,4 +1,4 @@
-# Imissher
+# EventEmitterReplay
 Replayable subset of EventEmitter api
 
 # Shoutout to _call

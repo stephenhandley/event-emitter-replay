@@ -1,18 +1,18 @@
 var Assert = require('assert');
 
-var Imissher = require('./index');
+var EventEmitterReplay = require('./index');
 
 var RANDYQUAID = 'randyquaid';
 
 function emitThreeEvents (once) {
-  var imissher = new Imissher();
+  var emitter = new EventEmitterReplay();
   var events = [];
-  imissher.emit(RANDYQUAID, 1);
-  imissher.emit(RANDYQUAID, 2);
-  imissher[once ? 'once' : 'on'](RANDYQUAID, function (num) {
+  emitter.emit(RANDYQUAID, 1);
+  emitter.emit(RANDYQUAID, 2);
+  emitter[once ? 'once' : 'on'](RANDYQUAID, function (num) {
     events.push(num);
   });
-  imissher.emit(RANDYQUAID, 3);
+  emitter.emit(RANDYQUAID, 3);
   return events;
 }
 
@@ -39,16 +39,16 @@ module.exports = {
       eventsToo.push(num);
     }
 
-    var imissher = new Imissher();
+    var emitter = new EventEmitterReplay();
 
-    imissher.emit(RANDYQUAID, 1);
+    emitter.emit(RANDYQUAID, 1);
 
-    imissher.on(RANDYQUAID, pushNum);
-    imissher.on(RANDYQUAID, pushNumToo);
+    emitter.on(RANDYQUAID, pushNum);
+    emitter.on(RANDYQUAID, pushNumToo);
 
-    imissher.emit(RANDYQUAID, 2);
-    imissher.removeListener(RANDYQUAID, pushNum);
-    imissher.emit(RANDYQUAID, 3);
+    emitter.emit(RANDYQUAID, 2);
+    emitter.removeListener(RANDYQUAID, pushNum);
+    emitter.emit(RANDYQUAID, 3);
 
     Assert.deepEqual(eventsOne, [1, 2], 'eventsOne should have only two events');
     Assert.deepEqual(eventsToo, [1, 2, 3], 'eventsToo should have all three events');
@@ -66,15 +66,15 @@ module.exports = {
       eventsToo.push(num);
     }
 
-    var imissher = new Imissher();
+    var emitter = new EventEmitterReplay();
 
-    imissher.once(RANDYQUAID, pushNum);
-    imissher.once(RANDYQUAID, pushNumToo);
+    emitter.once(RANDYQUAID, pushNum);
+    emitter.once(RANDYQUAID, pushNumToo);
 
-    imissher.removeListener(RANDYQUAID, pushNum);
-    imissher.emit(RANDYQUAID, 1);
-    imissher.emit(RANDYQUAID, 2);
-    imissher.emit(RANDYQUAID, 3);
+    emitter.removeListener(RANDYQUAID, pushNum);
+    emitter.emit(RANDYQUAID, 1);
+    emitter.emit(RANDYQUAID, 2);
+    emitter.emit(RANDYQUAID, 3);
 
     Assert.deepEqual(eventsOne, [], 'eventsOne should be empty');
     Assert.deepEqual(eventsToo, [1], 'eventsToo should have one event');

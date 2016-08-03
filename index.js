@@ -1,9 +1,9 @@
-function Imissher () {
+function Emitter () {
   this.events = [];
   this.bindings = [];
 }
 
-Imissher.prototype.on = function (event_name, callback) {
+Emitter.prototype.on = function (event_name, callback) {
   this.bindings.push({
     event_name: event_name,
     callback: callback,
@@ -12,7 +12,7 @@ Imissher.prototype.on = function (event_name, callback) {
   this._replay(event_name, callback);
 };
 
-Imissher.prototype.once = function (event_name, callback) {
+EventEmitterReplay.prototype.once = function (event_name, callback) {
   this.bindings.push({
     event_name: event_name,
     callback: callback,
@@ -21,7 +21,7 @@ Imissher.prototype.once = function (event_name, callback) {
   this._replay(event_name, callback);
 };
 
-Imissher.prototype.emit = function () {
+EventEmitterReplay.prototype.emit = function () {
   var event_name = arguments[0];
   var args = Array.prototype.slice.call(arguments, 1);
   var event = {
@@ -32,7 +32,7 @@ Imissher.prototype.emit = function () {
   this._emit(event);
 };
 
-Imissher.prototype._emit = function (event, onlyThisBinding) {
+EventEmitterReplay.prototype._emit = function (event, onlyThisBinding) {
   this.bindings.forEach(function (binding) {
     var doit;
     if (onlyThisBinding) {
@@ -51,7 +51,7 @@ Imissher.prototype._emit = function (event, onlyThisBinding) {
   }.bind(this));;
 };
 
-Imissher.prototype._replay = function (event_name, callback) {
+EventEmitterReplay.prototype._replay = function (event_name, callback) {
   this.events.forEach(function (event) {
     var binding = {
       event_name: event_name,
@@ -61,7 +61,7 @@ Imissher.prototype._replay = function (event_name, callback) {
   }.bind(this));
 };
 
-Imissher.prototype.removeListener = function (event_name, callback) {
+EventEmitterReplay.prototype.removeListener = function (event_name, callback) {
   this.bindings.forEach(function (binding, i) {
     var matches = this._bindingsEqual(binding, {
       event_name: event_name,
@@ -74,10 +74,10 @@ Imissher.prototype.removeListener = function (event_name, callback) {
   }.bind(this));
 };
 
-Imissher.prototype._bindingsEqual = function (binding1, binding2) {
+EventEmitterReplay.prototype._bindingsEqual = function (binding1, binding2) {
   var event_match = (binding1.event_name ===  binding2.event_name);
   var callback_match = (binding1.callback === binding2.callback);
   return event_match && callback_match;
 }
 
-module.exports = Imissher;
+module.exports = EventEmitterReplay;
