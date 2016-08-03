@@ -1,9 +1,9 @@
-function Emitter () {
+function EventEmitterReplay () {
   this.events = [];
   this.bindings = [];
 }
 
-Emitter.prototype.on = function (event_name, callback) {
+EventEmitterReplay.prototype.on = function (event_name, callback) {
   this.bindings.push({
     event_name: event_name,
     callback: callback,
