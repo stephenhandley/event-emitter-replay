@@ -1,4 +1,8 @@
-function EventEmitterReplay () {
+function EventEmitterReplay (args) {
+  if (!args) {
+    args = {};
+  }
+  this.repeat = !!args.repeat;
   this.events = [];
   this.bindings = [];
 }
@@ -53,10 +57,10 @@ EventEmitterReplay.prototype._emit = function (event, onlyThisBinding) {
 
 EventEmitterReplay.prototype._replay = function (event_name, callback) {
   this.events.forEach(function (event) {
-    var binding = {
+    var binding = this.repeat ? null : {
       event_name: event_name,
       callback: callback
-    }
+    };
     this._emit(event, binding);
   }.bind(this));
 };

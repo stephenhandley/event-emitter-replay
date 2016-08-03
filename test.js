@@ -78,5 +78,31 @@ module.exports = {
 
     Assert.deepEqual(eventsOne, [], 'eventsOne should be empty');
     Assert.deepEqual(eventsToo, [1], 'eventsToo should have one event');
+  },
+
+  'repeat replays events to all listeners when new listener added': function () {
+    var eventsOne = [];
+    var eventsToo = [];
+
+    var pushNum = function (num) {
+      eventsOne.push(num);
+    }
+
+    var pushNumToo = function (num) {
+      eventsToo.push(num);
+    }
+
+    var emitter = new EventEmitterReplay({
+      repeat: true
+    });
+
+    emitter.emit(RANDYQUAID, 1);
+    emitter.emit(RANDYQUAID, 2);
+
+    emitter.on(RANDYQUAID, pushNum);
+    emitter.on(RANDYQUAID, pushNumToo);
+
+    Assert.deepEqual(eventsOne, [1, 2, 1, 2], 'eventsOne should have two repeated events');
+    Assert.deepEqual(eventsToo, [1, 2], 'eventsToo should have just two events');
   }
 };
