@@ -46,11 +46,14 @@ EventEmitterReplay.prototype._emit = function (event, onlyThisBinding) {
   var remove_binding = null;
 
   this.bindings.forEach(function (binding, i) {
+    var event_match = (binding.event_name === event.name);
+
     var doit;
     if (onlyThisBinding) {
-      doit = this._bindingsEqual(binding, onlyThisBinding);
+      var binding_match = this._bindingsEqual(binding, onlyThisBinding);
+      doit = binding_match && event_match;
     } else {
-      doit = (binding.event_name === event.name);
+      doit = event_match;
     }
 
     if (this.greedy && event.consumed) {

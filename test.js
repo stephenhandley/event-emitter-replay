@@ -33,6 +33,31 @@ module.exports = {
     Assert.deepEqual(events, [1], 'Should have only 1 event');
   },
 
+  'listeners should only be triggered for events they are listening to': function () {
+    var emitter = new EventEmitterReplay();
+    var events = [];
+
+    var event_i_want = 'hi';
+
+    emitter.emit(event_i_want, 1);
+    emitter.emit('hello', 2);
+    emitter.emit('goodbye', 3);
+    emitter.emit(event_i_want, 4);
+
+    var push = pushTo(events);
+    emitter.on(event_i_want, push);
+
+    Assert.deepEqual(events, [1, 4], 'Events should only contain ' + event_i_want + ' events for .on');
+
+    emitter = new EventEmitterReplay();
+    emitter.emit(event_i_want, 1);
+    emitter.emit('hello', 2);
+
+    emitter.once(event_i_want, push);
+
+    Assert.deepEqual(events, [1, 4, 1], 'Events should only contain ' + event_i_want + ' events for .once')
+  },
+
   '.removeListener should remove event bindings': function () {
     var eventsOne = [];
     var eventsToo = [];

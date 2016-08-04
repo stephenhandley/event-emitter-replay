@@ -1,6 +1,6 @@
 {
   "name": "event-emitter-replay",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Replayable subset of EventEmitter api",
   "main": "index.js",
   "scripts": {
